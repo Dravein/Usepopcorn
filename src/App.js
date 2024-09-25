@@ -5,8 +5,6 @@ import { useLocalStorageState } from "./useLocalStorageState";
 import { useKey } from "./useKey";
 
 const average = (arr) =>
-  // arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
-
   arr
     .filter((cur) => typeof cur === "number")
     .reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
@@ -18,10 +16,8 @@ export default function App() {
 
   const [selectedId, setSelectedId] = useState(null);
 
-  //Custom Hook-unkat MovieDetalis-ra
   const { movies, isLoading, error } = useMovies(query);
 
-  //Custom Hook-ot használjuk localstorage-ra
   const [watched, setWatched] = useLocalStorageState([], "watched");
 
   function handleSelectMovie(id) {
@@ -34,10 +30,6 @@ export default function App() {
 
   function handleAddWatched(movie) {
     setWatched((watched) => [...watched, movie]);
-
-    // // Megjegyzi a bőngésző az adatot, localStorage csak String-be tárol adatot stringify kell. (Key, Value párosítással)
-    // // Effect-be csináljuk hogy reusable legyen a local storage tárolás. (Movie-kat megjegyezze amit hozzáadunk.)
-    // localStorage.setItem("watched", JSON.stringify([...watched, movie]));
   }
 
   function handleDeleteWatched(id) {
@@ -46,25 +38,12 @@ export default function App() {
 
   return (
     <>
-      {/* Composition a Prop Drilling elkerülésére a children változóval */}
       <NavBar>
         <Search query={query} setQuery={setQuery} />
         <NumResults movies={movies} />
       </NavBar>
       <Main>
-        {/* //// element attributumba átlehet adni az elementeket belefoglalva a propokat
-        <Box element={<MovieList movies={movies} />} />
-        <Box
-          element={
-            <>
-              <WatchedSummary watched={watched} />
-              <WatchedMoviesList watched={watched} />
-            </>
-          }
-        /> */}
-
         <Box>
-          {/* {isLoading ? <Loader /> : <MovieList movies={movies} />} */}
           {isLoading && <Loader />}
           {!isLoading && !error && (
             <MovieList movies={movies} onSelectMovie={handleSelectMovie} />
@@ -94,7 +73,6 @@ export default function App() {
   );
 }
 
-// Amíg nem tölti be a Fetch-elt Movie adatokat a Loading felirat jelenik meg
 function Loader() {
   return <p className="loader">Loading...</p>;
 }
@@ -126,43 +104,14 @@ function Logo() {
 }
 
 function Search({ query, setQuery }) {
-  // // Input Elementet belemegy a írás jel, nem illik így csinálni a React működéshez - helyette lesz useRef-hook
-  // useEffect(function () {
-  //   const el = document.querySelector(".search");
-  //   console.log(el);
-  //   el.focus();
-  // }, []);
-
-  // HTML elementet tartalmazz, csatlakoztatjuk a HTML element ref={inputEl} attribútumához
   const inputEl = useRef(null);
 
-  // Search feldolgozása Custom Hook-al.
   useKey("Enter", function () {
     if (document.activeElement === inputEl.current) return;
-    // console.log(inputEl.current);
+
     inputEl.current.focus();
     setQuery("");
   });
-
-  // useEffect(
-  //   function () {
-  //     function callback(e) {
-  //       //ActiveElement azt jelenti épp min van a fókusz, ha az Inputon van nem csinál semmit a függvény csak visszatér
-
-  //       if (e.code === "Enter") {
-  //         if (document.activeElement === inputEl.current) return;
-  //         // console.log(inputEl.current);
-  //         inputEl.current.focus();
-  //         setQuery("");
-  //       }
-  //     }
-  //     document.addEventListener("keydown", callback);
-
-  //     return () => document.addEventListener("keydown", callback);
-  //   },
-  //   //Ha funkció változna meg akkor hívja
-  //   [setQuery]
-  // );
 
   return (
     <input
@@ -204,31 +153,6 @@ function Box({ children }) {
   );
 }
 
-/*
-// LisBox és WatchedBox-ból csinálnuk egy Box Componentet ami újra felhasználható hiszen ez a kettő hasonló volt.
-function WatchedBox() {
-  const [watched, setWatched] = useState(tempWatchedData);
-  const [isOpen2, setIsOpen2] = useState(true);
-
-  return (
-    <div className="box">
-      <button
-        className="btn-toggle"
-        onClick={() => setIsOpen2((open) => !open)}
-      >
-        {isOpen2 ? "–" : "+"}
-      </button>
-      {isOpen2 && (
-        <>
-          <WatchedSummary watched={watched} />
-          <WatchedMoviesList watched={watched} />
-        </>
-      )}
-    </div>
-  );
-}
-*/
-
 function MovieList({ movies, onSelectMovie }) {
   return (
     <ul className="list list-movies">
@@ -259,12 +183,10 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
   const [isLoading, setIsLoading] = useState(false);
   const [userRating, setUserRating] = useState("");
 
-  //Számolja mennyiszer adott új Ratinget (Csillagot) a User egy Movie-nek.
   const countRef = useRef(0);
 
   useEffect(
     function () {
-      // IF kell mert useEffect lefut első Mount-nál is.
       if (userRating) {
         countRef.current = countRef.current + 1;
       }
@@ -272,7 +194,6 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
     [userRating]
   );
 
-  //Benne van-es a listába amit látunk (Ne lehessen majd őjra hozzáadni)
   const isWatched = watched.map((movie) => movie.imdbID).includes(selectedId);
 
   const watchedUserRating = watched.find(
@@ -292,29 +213,8 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
     Genre: genre,
   } = movie;
 
-  //Megszegjük a Hook szabályt, alsó paranccsal kiakpcsoljuk eslintet engedje.
-  // /* eslint-disable */
-  // if (imdbRating > 8) [isTop, setIsTop] = useState(true);
-
-  //Hook szabályt itt megszegjük előbb térünk vissza, felborul a hook sorrend.
-  // if (imdbRating > 8) return <p>Greatest ever!</p>;
-
-  // //Nem változik useState(imdbRating > 8) eredménye hiába választunk ki olyan filmet ami 8-nál nagyobb.
-  // // useState(imdbRating > 8) egyszer fut csak le az initial rendernél
-  // const [isTop, setIsTop] = useState(imdbRating > 8);
-  // console.log(isTop);
-  // //useEffectel meglehet hackelni
-  // useEffect(
-  //   function () {
-  //     setIsTop(imdbRating > 8);
-  //   },
-  //   [imdbRating]
-  // );
-  //Helyette egyszerűbb derived statet használni
   const isTop = imdbRating > 8;
   console.log(isTop);
-
-  // const [avgRating, setAvgRating] = useState(0);
 
   function handleAdd() {
     const newWatchedMovie = {
@@ -330,13 +230,6 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
 
     onAddWatched(newWatchedMovie);
     onCloseMovie();
-
-    // setAvgRating(Number(imdbRating));
-    // // 0-át fog kiírni avgRating, az asszinkron feldolgozás miatt, nem amit beállítottunk.
-    // alert(avgRating);
-    // // setAvgRating((avgRating + userRating) / 2);
-    // //Így jó mert Paraméterbe hozzáférünk a beállítotthoz.
-    // setAvgRating((avgRating) => (avgRating + userRating) / 2);
   }
 
   useKey("Escape", onCloseMovie);
@@ -358,18 +251,13 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
     [selectedId]
   );
 
-  // A Browser tabján lévő címet változtatja meg arra aminek épp a MovieDetailsjét nézzük
   useEffect(
     function () {
       if (!title) return;
       document.title = `Movie | ${title}`;
 
-      // CleanUp, akkor játszódik le amikot a Component Ummountol
-      // Race Condition feloldására is használjuk
       return function () {
         document.title = "usePopcorn";
-        //JS Closure miatt a title-t még mindig a kiválaszott film lesz.
-        // console.log(`Clean up effect for movie ${title}`);
       };
     },
     [title]
@@ -398,8 +286,6 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
               </p>
             </div>
           </header>
-
-          {/* <p>{avgRating}</p> */}
 
           <section>
             <div className="rating">

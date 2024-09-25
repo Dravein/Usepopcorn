@@ -12,9 +12,8 @@ const starContainerStyle = {
 };
 
 StarRating.propTypes = {
-  //isRequired muszály megadni Props-ba (Ha van Default beállítva felesleges)
   maxRating: PropTypes.number,
-  // maxRating: PropTypes.number.isRequired,
+
   defaultRating: PropTypes.number,
   color: PropTypes.string,
   size: PropTypes.number,
@@ -27,13 +26,13 @@ export default function StarRating({
   maxRating = 5,
   color = "#fcc419",
   size = 48,
-  // Adhatunk más stílust a csillagSlidernek
+
   className = "",
-  //Üzenetet ír ki szám helyett
+
   messages = [],
-  //Hány csillagon legyen alapból
+
   defaultRating = 0,
-  //Hozzáférést add a csillagon belüli rating stateéhez amit betudunk állítani egy külső state-nek is értéknek. (Lást index.js Test funkcióba.)
+
   onSetRating,
 }) {
   const [rating, setRating] = useState(defaultRating);
@@ -41,7 +40,7 @@ export default function StarRating({
 
   function handleRating(rating) {
     setRating(rating);
-    //// - Hozzáférést add a csillagon belüli rating stateéhez amit betudunk állítani egy külső state-nek is értéknek. (Lást index.js Test funkcióba.)
+
     onSetRating(rating);
   }
 
