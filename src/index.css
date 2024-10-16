@@ -54,8 +54,19 @@ body {
   max-width: 42rem;
   background-color: var(--color-background-500);
   border-radius: 0.9rem;
-  overflow: smooth;
+  overflow: aut;
+  overflow-x: hidden;
   position: relative;
+}
+
+.box::-webkit-scrollbar {
+  background-color: #343a40;
+  border-radius: 10px;
+}
+
+.box::-webkit-scrollbar-thumb {
+  background-color: rgb(107, 106, 106); /* Szürke görgetősáv */
+  border-radius: 10px; /* Lekerekített élek */
 }
 
 .loader {
@@ -339,7 +350,7 @@ body {
   cursor: pointer;
   z-index: 999;
   display: flex;
-  align-items: center;
+  /* align-items: center; */
   justify-content: center;
 }
 
